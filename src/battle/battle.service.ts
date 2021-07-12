@@ -8,6 +8,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
 import { BattleEntity } from './battle.entity';
+import { BattleInGameEntity } from './battleInGame/battle-in-game.entity';
+import { BattleInGameService } from './battleInGame/battle-in-game.service';
 import { BattleDTO } from './dto/battle.dto';
 import { CreateBattleDTO } from './dto/create-battle.dto';
 
@@ -15,7 +17,8 @@ import { CreateBattleDTO } from './dto/create-battle.dto';
 export class BattleService {
   constructor(
     @InjectRepository(BattleEntity)
-    private readonly battleRepository: Repository<BattleEntity>
+    private readonly battleRepository: Repository<BattleEntity>,
+    private readonly battleInGameService: BattleInGameService
   ) {}
 
   public async findOne(
@@ -24,17 +27,15 @@ export class BattleService {
     errorMessage?: HttpException | null
   ) {
     const battle = await this.battleRepository.findOne(id, findOptions);
-
     if (!battle && errorMessage !== null) {
       throw errorMessage || new NotFoundException('Battle not found');
     }
-
     return battle;
   }
 
   public async searchBattles(): Promise<BattleDTO[]> {
     const battles = await this.battleRepository.find({
-      relations: ['armies'],
+      relations: ['armies', 'history'],
       loadEagerRelations: true
     });
     return battles.map(BattleService.convertToDto);
@@ -58,11 +59,26 @@ export class BattleService {
     return BattleService.convertToDto(battle);
   }
 
+  public async startBattle(battleId: string): Promise<BattleInGameEntity> {
+    const battle = await this.findOne(battleId, {
+      relations: ['armies', 'history'],
+      loadEagerRelations: true
+    });
+    if (!battle) {
+      throw new NotFoundException(`Battle with ${battleId} doesn't exist`);
+    }
+    const battleInGame = await this.battleInGameService.createInGameBattle(
+      battle
+    );
+    return battleInGame;
+  }
+
   public static convertToDto(battleEntry: BattleEntity): BattleDTO {
     return {
       id: battleEntry.id,
       name: battleEntry.name,
-      armies: battleEntry.armies || []
+      armies: battleEntry.armies || [],
+      history: battleEntry.history || []
     };
   }
 }

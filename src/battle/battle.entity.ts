@@ -6,6 +6,7 @@ import {
   OneToMany
 } from 'typeorm';
 import { ArmyEntity } from '../army/army.entity';
+import { BattleInGameEntity } from './battleInGame/battle-in-game.entity';
 
 @Entity({ name: 'battles' })
 export class BattleEntity {
@@ -23,4 +24,10 @@ export class BattleEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(
+    () => BattleInGameEntity,
+    battleInGame => battleInGame.battle
+  )
+  history: BattleInGameEntity[];
 }

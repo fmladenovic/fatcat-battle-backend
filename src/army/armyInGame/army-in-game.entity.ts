@@ -3,7 +3,8 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   Column,
-  ManyToOne
+  ManyToOne,
+  RelationId
 } from 'typeorm';
 import { BattleInGameEntity } from '../../battle/battleInGame/battle-in-game.entity';
 import { ArmyEntity } from '../army.entity';
@@ -16,7 +17,8 @@ export const attackStrategy = {
 
 export const status = {
   ACTIVE: 'ACTIVE',
-  DONE: 'DONE'
+  DESTROYED: 'DESTROYED',
+  WINNER: 'WINNER'
 };
 
 @Entity({ name: 'armies_in_game' })
@@ -33,14 +35,21 @@ export class ArmyInGameEntity {
   @Column()
   currentLoadingTime: number;
 
-  @ManyToOne(() => ArmyEntity)
-  army: ArmyEntity;
+  @Column()
+  attackStrategy: 'RANDOM' | 'STRONGES' | 'WEAKEST';
 
-  @ManyToOne(() => BattleInGameEntity)
+  @RelationId((army: ArmyInGameEntity) => army.battleInGame)
+  battleInGameId: string;
+
+  @ManyToOne(
+    () => BattleInGameEntity,
+    battle => battle.armiesInGame,
+    { onDelete: 'CASCADE' }
+  )
   battleInGame: BattleInGameEntity;
 
   @Column()
-  status: 'ACTIVE' | 'DONE';
+  status: 'ACTIVE' | 'DESTROYED' | 'WINNER';
 
   @CreateDateColumn()
   createdAt: Date;

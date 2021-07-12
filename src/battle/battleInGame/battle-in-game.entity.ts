@@ -5,7 +5,10 @@ import {
   Column,
   ManyToOne,
   OneToOne,
-  OneToMany
+  OneToMany,
+  RelationId,
+  JoinColumn,
+  JoinTable
 } from 'typeorm';
 import { ArmyInGameEntity } from '../../army/armyInGame/army-in-game.entity';
 import { LogEntity } from '../../log/log.entity';
@@ -21,26 +24,33 @@ export class BattleInGameEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => BattleEntity)
+  @RelationId((battleInGame: BattleInGameEntity) => battleInGame.battle)
+  battleId: string;
+
+  @ManyToOne(
+    () => BattleEntity,
+    battle => battle.history,
+    { onDelete: 'CASCADE' }
+  )
   battle: BattleEntity;
 
   @OneToMany(
     () => ArmyInGameEntity,
-    army => army.battleInGame
+    army => army.battleInGame,
+    {
+      eager: true
+    }
   )
   armiesInGame: ArmyInGameEntity[];
 
   @Column()
   status: 'FINISHED' | 'IN_PROGRESS';
 
-  @OneToOne(() => ArmyInGameEntity)
-  winner: ArmyInGameEntity;
-
-  @OneToMany(
-    () => LogEntity,
-    log => log.battleInGame
-  )
-  logs: LogEntity[];
+  // @OneToMany(
+  //   () => LogEntity,
+  //   log => log.battleInGame
+  // )
+  // logs: LogEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
