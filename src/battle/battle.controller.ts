@@ -1,5 +1,4 @@
-import { Controller, Get, Param, Query, Post, Body, Delete, UseGuards, HttpCode, Put } from '@nestjs/common';
-import { CreateArmyDTO } from '../army/dto/create-army.dto';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { BattleService } from './battle.service';
 import { BattleDTO } from './dto/battle.dto';
 import { CreateBattleDTO } from './dto/create-battle.dto';
@@ -17,5 +16,4 @@ export class BattleController {
   public createBattle(@Body() battleInfo: CreateBattleDTO): Promise<BattleDTO> {
     return this.battleServie.createBattle(battleInfo);
   }
-
 }

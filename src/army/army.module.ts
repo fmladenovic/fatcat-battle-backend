@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BattleModule } from '../battle/battle.module';
 import { ArmyController } from './army.controller';
@@ -9,6 +9,6 @@ import { ArmyService } from './army.service';
   imports: [TypeOrmModule.forFeature([ArmyEntity]), BattleModule],
   controllers: [ArmyController],
   providers: [ArmyService],
-  exports: [ArmyService],
+  exports: [ArmyService]
 })
 export class ArmyModule {}

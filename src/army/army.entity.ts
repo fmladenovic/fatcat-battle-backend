@@ -1,18 +1,25 @@
-import {Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ManyToOne, RelationId} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  Column,
+  ManyToOne,
+  RelationId
+} from 'typeorm';
 import { BattleEntity } from '../battle/battle.entity';
 
 export const attackStrategy = {
   RANDOM: 'RANDOM',
-  STRONGES: 'STRONGES', 
-  WEAKEST:  'WEAKEST'
-}
+  STRONGES: 'STRONGES',
+  WEAKEST: 'WEAKEST'
+};
 
 @Entity({ name: 'armies' })
 export class ArmyEntity {
-  @PrimaryGeneratedColumn('uuid') 
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   name: string;
 
   @Column()
@@ -20,17 +27,16 @@ export class ArmyEntity {
 
   @Column()
   attackStrategy: 'RANDOM' | 'STRONGES' | 'WEAKEST';
-  
+
   @RelationId((army: ArmyEntity) => army.battle)
   battleId: string;
 
   @ManyToOne(
-    () => BattleEntity, 
-    (battle) => battle.armies,
-    { onDelete: 'CASCADE' },
+    () => BattleEntity,
+    battle => battle.armies,
+    { onDelete: 'CASCADE' }
   )
   battle: BattleEntity;
-
 
   @CreateDateColumn()
   createdAt: Date;

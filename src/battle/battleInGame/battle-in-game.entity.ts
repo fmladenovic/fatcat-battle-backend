@@ -1,4 +1,12 @@
-import {Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ManyToOne, OneToOne, OneToMany} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  Column,
+  ManyToOne,
+  OneToOne,
+  OneToMany
+} from 'typeorm';
 import { ArmyInGameEntity } from '../../army/armyInGame/army-in-game.entity';
 import { LogEntity } from '../../log/log.entity';
 import { BattleEntity } from '../battle.entity';
@@ -6,11 +14,11 @@ import { BattleEntity } from '../battle.entity';
 export const status = {
   FINISHED: 'FINISHED',
   IN_PROGRESS: 'IN_PROGRESS'
-}
+};
 
 @Entity({ name: 'battles_in_game' })
 export class BattleInGameEntity {
-  @PrimaryGeneratedColumn('uuid') 
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne(() => BattleEntity)
@@ -18,7 +26,7 @@ export class BattleInGameEntity {
 
   @OneToMany(
     () => ArmyInGameEntity,
-    (army) => army.battleInGame,
+    army => army.battleInGame
   )
   armiesInGame: ArmyInGameEntity[];
 
@@ -30,7 +38,7 @@ export class BattleInGameEntity {
 
   @OneToMany(
     () => LogEntity,
-    (log) => log.battleInGame,
+    log => log.battleInGame
   )
   logs: LogEntity[];
 

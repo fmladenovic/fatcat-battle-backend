@@ -7,10 +7,11 @@ import { ConfigService } from '../config/config.service';
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => configService.getDatabaseConfig(),
-      inject: [ConfigService],
-    }),
+      useFactory: (configService: ConfigService) =>
+        configService.getDatabaseConfig(),
+      inject: [ConfigService]
+    })
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule]
 })
 export class DbModule {}

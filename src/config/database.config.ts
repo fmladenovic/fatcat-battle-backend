@@ -16,8 +16,8 @@ export const createDbConfig = (): TypeOrmModuleOptions => ({
   migrations: ['dist/db/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',
   cli: {
-    migrationsDir: 'src/db/migrations/',
-  },
+    migrationsDir: 'src/db/migrations/'
+  }
 });
 
 export const createSeedConfig = (): TypeOrmModuleOptions => ({
@@ -35,6 +35,6 @@ export const createSeedConfig = (): TypeOrmModuleOptions => ({
   migrations: ['dist/db/seeds/*{.ts,.js}'],
   migrationsTableName: 'seeds',
   cli: {
-    migrationsDir: 'src/db/seeds/',
-  },
+    migrationsDir: 'src/db/seeds/'
+  }
 });

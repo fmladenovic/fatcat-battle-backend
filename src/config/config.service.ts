@@ -22,12 +22,17 @@ export class ConfigService {
     return 'YYYY-MM';
   }
 
-  getRateAPIInfo(): { url: string; ratesUri: string; apiKey: string; dateFormat: string } {
+  getRateAPIInfo(): {
+    url: string;
+    ratesUri: string;
+    apiKey: string;
+    dateFormat: string;
+  } {
     return {
       url: process.env.RATE_API_URL,
       ratesUri: process.env.RATE_API_RATES_URI,
       dateFormat: process.env.RATE_API_DATE_FORMAT,
-      apiKey: process.env.RATE_API_KEY,
+      apiKey: process.env.RATE_API_KEY
     };
   }
 

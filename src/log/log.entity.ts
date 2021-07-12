@@ -1,9 +1,15 @@
-import {Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ManyToOne} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  Column,
+  ManyToOne
+} from 'typeorm';
 import { BattleInGameEntity } from '../battle/battleInGame/battle-in-game.entity';
 
 @Entity({ name: 'logs' })
 export class LogEntity {
-  @PrimaryGeneratedColumn('uuid') 
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
