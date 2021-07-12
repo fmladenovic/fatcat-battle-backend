@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  main:
+    container_name: main
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - 9229:9229
+    command: /bin/bash -l -c "npm run start:dev"
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: mysql
+    restart: always
+    networks:
+      - webnet
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_SCHEMA_NAME}
+    volumes:
+      - fatcat-battle-dbdata:/var/lib/mysql
+networks:
+  webnet:
+volumes:
+  fatcat-battle-dbdata:
+    external: true
