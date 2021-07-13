@@ -9,7 +9,7 @@ export class battles1626003971330 implements MigrationInterface {
           {
             name: 'id',
             type: 'varchar',
-            length: '36',
+            length: '40',
             isPrimary: true
           },
           {

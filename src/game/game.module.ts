@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ArmyInGameModule } from '../army/armyInGame/army-in-game.module';
 import { BattleInGameModule } from '../battle/battleInGame/battle-in-game.module';
+import { LogModule } from '../log/log.module';
 import { GameService } from './game.service';
 
 @Module({
-  imports: [ArmyInGameModule, BattleInGameModule], // LogModule
+  imports: [ArmyInGameModule, BattleInGameModule, LogModule],
   providers: [GameService],
   exports: [GameService]
 })

@@ -14,7 +14,7 @@ export class battlesInGame1626121660546 implements MigrationInterface {
           {
             name: 'id',
             type: 'varchar',
-            length: '36',
+            length: '40',
             isPrimary: true
           },
           {

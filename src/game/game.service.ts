@@ -4,8 +4,9 @@ import { ArmyInGameEntity } from '../army/armyInGame/army-in-game.entity';
 import { ArmyInGameService } from '../army/armyInGame/army-in-game.service';
 import { BattleInGameEntity } from '../battle/battleInGame/battle-in-game.entity';
 import { BattleInGameService } from '../battle/battleInGame/battle-in-game.service';
+import { LogService } from '../log/log.service';
 
-const LOADING_TIME_PER_UNIT = 10;
+const LOADING_TIME_PER_UNIT = 100;
 const DAMAGE_PER_UNIT = 0.5;
 const DAMAGE_LAST_UNIT = 1;
 
@@ -13,7 +14,8 @@ const DAMAGE_LAST_UNIT = 1;
 export class GameService {
   constructor(
     private readonly armyInGameService: ArmyInGameService,
-    private readonly battleInGameService: BattleInGameService
+    private readonly battleInGameService: BattleInGameService,
+    private readonly logService: LogService
   ) {}
 
   private pickTarget(
@@ -48,11 +50,15 @@ export class GameService {
   private doDamage(attacker: ArmyInGameEntity, target: ArmyInGameEntity) {
     let damage = this.calculateDamage(attacker);
     if (!damage) {
-      this.saveLog(`Army ${attacker.name} (${attacker.id}) miss the target.`);
+      this.saveLog(
+        `Army ${attacker.name} (${attacker.id}) miss the target.`,
+        target.battleInGame.id
+      );
       return;
     }
     this.saveLog(
-      `Army ${attacker.name} (${attacker.id}) hits target army ${target.name} (${target.id}) with damage: ${damage}.`
+      `Army ${attacker.name} (${attacker.id}) hits target army ${target.name} (${target.id}) with damage: ${damage}.`,
+      target.battleInGame.id
     );
     target.currentUnits = target.currentUnits - damage;
     this.armyInGameService.updateArmyInGame({
@@ -72,13 +78,12 @@ export class GameService {
       }, i * LOADING_TIME_PER_UNIT);
     }
   }
-  private attack(
-    attacker: ArmyInGameEntity,
-    armies: ArmyInGameEntity[],
-    battleInGameId: string
-  ) {
+  private attack(attacker: ArmyInGameEntity, armies: ArmyInGameEntity[]) {
     if (attacker.currentUnits <= 0) {
-      this.saveLog(`Army ${attacker.name} (${attacker.id}) is destroyed.`);
+      this.saveLog(
+        `Army ${attacker.name} (${attacker.id}) is destroyed.`,
+        attacker.battleInGame.id
+      );
       this.armyInGameService.updateArmyInGame({
         id: attacker.id,
         status: 'DESTROYED'
@@ -90,13 +95,16 @@ export class GameService {
     );
 
     if (restArmies.length === 0) {
-      this.saveLog(`Winner is: ${attacker.name} (${attacker.id})`);
+      this.saveLog(
+        `Winner is: ${attacker.name} (${attacker.id})`,
+        attacker.battleInGame.id
+      );
       this.armyInGameService.updateArmyInGame({
         id: attacker.id,
         status: 'WINNER'
       });
       this.battleInGameService.updateInGameBattle({
-        id: battleInGameId,
+        id: attacker.battleInGame.id,
         status: 'FINISHED'
       });
       return;
@@ -104,9 +112,9 @@ export class GameService {
     const target = this.pickTarget(restArmies, attacker.attackStrategy);
     this.doDamage(attacker, target);
 
-    // reload time based on current currentUnits
+    // reload time based on current units
     setTimeout(
-      () => this.attack(attacker, armies, battleInGameId),
+      () => this.attack(attacker, armies),
       attacker.currentUnits * LOADING_TIME_PER_UNIT
     );
     this.saveLoadingTime(attacker);
@@ -115,16 +123,15 @@ export class GameService {
   public play(battleInGame: BattleInGameEntity) {
     for (let army of battleInGame.armiesInGame) {
       setTimeout(
-        () => this.attack(army, battleInGame.armiesInGame, battleInGame.id),
+        () => this.attack(army, battleInGame.armiesInGame),
         army.currentLoadingTime * LOADING_TIME_PER_UNIT
       );
+      this.saveLoadingTime(army);
     }
   }
 
-  // gameId
-  private saveLog(message: string) {
-    const now = new Date(); // format this
-    Logger.log(now, message);
-    // save log
+  private saveLog(message: string, battleInGameId: string) {
+    this.logService.createLog(message, battleInGameId);
+    Logger.log(new Date(), message);
   }
 }

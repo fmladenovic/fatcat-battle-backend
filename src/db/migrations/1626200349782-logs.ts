@@ -5,12 +5,11 @@ import {
   TableForeignKey
 } from 'typeorm';
 
-// foreign key?
-export class armies1626009299636 implements MigrationInterface {
+export class logs1626200349782 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'armies',
+        name: 'logs',
         columns: [
           {
             name: 'id',
@@ -19,22 +18,12 @@ export class armies1626009299636 implements MigrationInterface {
             isPrimary: true
           },
           {
-            name: 'name',
+            name: 'message',
             type: 'varchar',
             isNullable: false
           },
           {
-            name: 'units',
-            type: 'integer',
-            isNullable: false
-          },
-          {
-            name: 'attack_strategy',
-            type: 'varchar',
-            isNullable: false
-          },
-          {
-            name: 'battle_id',
+            name: 'battle_in_game_id',
             type: 'varchar',
             length: '36',
             isNullable: false
@@ -50,23 +39,23 @@ export class armies1626009299636 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'armies',
+      'logs',
       new TableForeignKey({
-        columnNames: ['battle_id'],
+        columnNames: ['battle_in_game_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'battles',
+        referencedTableName: 'battles_in_game',
         onDelete: 'CASCADE'
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const armiesTable = await queryRunner.getTable('armies');
-    const armiesBattle = armiesTable.foreignKeys.find(
-      fk => fk.columnNames[0] === 'battle_id'
+    const logsTable = await queryRunner.getTable('logs');
+    const logsBattlesInGame = logsTable.foreignKeys.find(
+      fk => fk.columnNames[0] === 'battle_in_game_id'
     );
 
-    await queryRunner.dropForeignKey('armies', armiesBattle);
-    await queryRunner.dropTable('armies');
+    await queryRunner.dropForeignKey('logs', logsBattlesInGame);
+    await queryRunner.dropTable('logs');
   }
 }

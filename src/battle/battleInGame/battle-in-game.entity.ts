@@ -46,11 +46,14 @@ export class BattleInGameEntity {
   @Column()
   status: 'FINISHED' | 'IN_PROGRESS';
 
-  // @OneToMany(
-  //   () => LogEntity,
-  //   log => log.battleInGame
-  // )
-  // logs: LogEntity[];
+  @OneToMany(
+    () => LogEntity,
+    log => log.battleInGame,
+    {
+      eager: true
+    }
+  )
+  logs: LogEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

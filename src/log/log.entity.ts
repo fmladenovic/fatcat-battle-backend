@@ -3,7 +3,8 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   Column,
-  ManyToOne
+  ManyToOne,
+  RelationId
 } from 'typeorm';
 import { BattleInGameEntity } from '../battle/battleInGame/battle-in-game.entity';
 
@@ -14,6 +15,9 @@ export class LogEntity {
 
   @Column()
   message: string;
+
+  @RelationId((log: LogEntity) => log.battleInGame)
+  battleInGameId: string;
 
   @ManyToOne(() => BattleInGameEntity)
   battleInGame: BattleInGameEntity;
