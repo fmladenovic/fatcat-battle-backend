@@ -8,8 +8,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ArmyInGameService } from '../../army/armyInGame/army-in-game.service';
+import { GameService } from '../../game/game.service';
 import { BattleEntity } from '../battle.entity';
 import { BattleInGameEntity } from './battle-in-game.entity';
+import { UpdateBattleInGameDTO } from './dto/update-battle-in-game.dto.';
 
 @Injectable()
 export class BattleInGameService {
@@ -44,8 +46,7 @@ export class BattleInGameService {
     }
 
     const battleInGame = this.battleInGameRepository.create({
-      battle: battle,
-      battleId: battle.id,
+      battle: { id: battle.id },
       // armiesInGame: armies,
       status: 'IN_PROGRESS'
     });
@@ -56,10 +57,17 @@ export class BattleInGameService {
       battleInGame
     );
 
-    await this.saveBattleInGame({
+    const battleInGameWitArmies = this.battleInGameRepository.create({
       ...battleInGame,
       armiesInGame
     });
-    return battleInGame;
+    await this.saveBattleInGame(battleInGameWitArmies);
+    return battleInGameWitArmies;
+  }
+
+  public async updateInGameBattle(battleInfo: UpdateBattleInGameDTO) {
+    const battleInGame = this.battleInGameRepository.create(battleInfo);
+    console.log('OKEJ', battleInGame);
+    await this.saveBattleInGame(battleInGame);
   }
 }

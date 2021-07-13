@@ -6,5 +6,5 @@ export class CreateArmyDTO {
   @IsNotEmpty()
   units: number;
   @IsNotEmpty()
-  attackStrategy: 'RANDOM' | 'STRONGES' | 'WEAKEST';
+  attackStrategy: 'RANDOM' | 'STRONGEST' | 'WEAKEST';
 }

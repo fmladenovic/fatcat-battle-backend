@@ -10,7 +10,7 @@ import { BattleEntity } from '../battle/battle.entity';
 
 export const attackStrategy = {
   RANDOM: 'RANDOM',
-  STRONGES: 'STRONGES',
+  STRONGEST: 'STRONGEST',
   WEAKEST: 'WEAKEST'
 };
 
@@ -26,7 +26,7 @@ export class ArmyEntity {
   units: number;
 
   @Column()
-  attackStrategy: 'RANDOM' | 'STRONGES' | 'WEAKEST';
+  attackStrategy: 'RANDOM' | 'STRONGEST' | 'WEAKEST';
 
   @RelationId((army: ArmyEntity) => army.battle)
   battleId: string;

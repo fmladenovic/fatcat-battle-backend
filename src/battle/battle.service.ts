@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
+import { GameService } from '../game/game.service';
 import { BattleEntity } from './battle.entity';
 import { BattleInGameEntity } from './battleInGame/battle-in-game.entity';
 import { BattleInGameService } from './battleInGame/battle-in-game.service';
@@ -18,7 +19,8 @@ export class BattleService {
   constructor(
     @InjectRepository(BattleEntity)
     private readonly battleRepository: Repository<BattleEntity>,
-    private readonly battleInGameService: BattleInGameService
+    private readonly battleInGameService: BattleInGameService,
+    private readonly gameService: GameService
   ) {}
 
   public async findOne(
@@ -70,6 +72,8 @@ export class BattleService {
     const battleInGame = await this.battleInGameService.createInGameBattle(
       battle
     );
+    this.gameService.play(battleInGame);
+
     return battleInGame;
   }
 
@@ -78,7 +82,11 @@ export class BattleService {
       id: battleEntry.id,
       name: battleEntry.name,
       armies: battleEntry.armies || [],
-      history: battleEntry.history || []
+      history: battleEntry.history?
+        battleEntry.history.sort(
+          (a: BattleInGameEntity, b: BattleInGameEntity) =>
+            b.createdAt.getTime() - a.createdAt.getTime()
+        ) : []
     };
   }
 }

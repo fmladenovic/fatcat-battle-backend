@@ -8,9 +8,14 @@ async function bootstrap() {
 
   // global settings
   app.setGlobalPrefix('/api/v1');
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, forbidUnknownValues: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true
+    })
+  );
   app.enableCors();
-
 
   const configService = app.get(ConfigService);
   await app.listen(configService.getServerPort());
