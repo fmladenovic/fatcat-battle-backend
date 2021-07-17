@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BattleInGameEntity } from '../battle/battleInGame/battle-in-game.entity';
 import { LogEntity } from './log.entity';
 
 @Injectable()
@@ -29,14 +28,18 @@ export class LogService {
   }
 
   public async createLog(
+    id: string,
     message: string,
-    battleInGameId: string
+    battleInGameId: string,
+    createdAt: Date
   ): Promise<LogEntity> {
     const log = this.logRepository.create({
+      id,
       message,
-      battleInGame: { id: battleInGameId }
+      battleInGame: { id: battleInGameId },
+      createdAt
     });
-    await this.saveLog(log);
+    this.saveLog(log);
     return log;
   }
 }

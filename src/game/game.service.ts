@@ -5,8 +5,11 @@ import { ArmyInGameService } from '../army/armyInGame/army-in-game.service';
 import { BattleInGameEntity } from '../battle/battleInGame/battle-in-game.entity';
 import { BattleInGameService } from '../battle/battleInGame/battle-in-game.service';
 import { LogService } from '../log/log.service';
+import { GameGateway } from './game.gateway';
+import { v4 as uuid } from 'uuid';
+import { LogEntity } from '../log/log.entity';
 
-const LOADING_TIME_PER_UNIT = 100;
+const LOADING_TIME_PER_UNIT = 10;
 const DAMAGE_PER_UNIT = 0.5;
 const DAMAGE_LAST_UNIT = 1;
 
@@ -15,7 +18,8 @@ export class GameService {
   constructor(
     private readonly armyInGameService: ArmyInGameService,
     private readonly battleInGameService: BattleInGameService,
-    private readonly logService: LogService
+    private readonly logService: LogService,
+    private readonly wsService: GameGateway
   ) {}
 
   private pickTarget(
@@ -107,6 +111,7 @@ export class GameService {
         id: attacker.battleInGame.id,
         status: 'FINISHED'
       });
+      this.wsService.finishedBattle(attacker.battleInGame.id, 'FINISHED');
       return;
     }
     const target = this.pickTarget(restArmies, attacker.attackStrategy);
@@ -130,8 +135,15 @@ export class GameService {
     }
   }
 
-  private saveLog(message: string, battleInGameId: string) {
-    this.logService.createLog(message, battleInGameId);
+  private async saveLog(message: string, battleInGameId: string) {
+    const log = {
+      id: uuid(),
+      message,
+      battleInGameId,
+      createdAt: new Date()
+    } as LogEntity;
+    this.logService.createLog(log.id, message, battleInGameId, log.createdAt);
+    this.wsService.createdLog(log);
     Logger.log(new Date(), message);
   }
 }
