@@ -5,11 +5,13 @@ import {
   Logger
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isUUID } from 'class-validator';
 import { Repository } from 'typeorm';
 import { BattleEntity } from '../../battle/battle.entity';
 import { BattleInGameEntity } from '../../battle/battleInGame/battle-in-game.entity';
 import { ArmyInGameEntity } from './army-in-game.entity';
 import { UpdateArmyInGame } from './dto/update-army-in-game.dto.';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ArmyInGameService {
@@ -23,7 +25,7 @@ export class ArmyInGameService {
     errorMessage?: HttpException | null
   ) {
     try {
-      await this.armyInGameRepository.save(army);
+      await this.armyInGameRepository.update(army.id, { ...army });
     } catch (e) {
       Logger.error(e.message, e.stack, 'ArmyInGameService');
       if (errorMessage !== null) {
@@ -48,10 +50,10 @@ export class ArmyInGameService {
     }
   }
 
-  public async createArmiesInGame(
+  public createArmiesInGame(
     battle: BattleEntity,
     battleInGame: BattleInGameEntity
-  ): Promise<ArmyInGameEntity[]> {
+  ): ArmyInGameEntity[] {
     let armies = undefined;
     const lastBattleState = battle.history.sort(
       (a: BattleInGameEntity, b: BattleInGameEntity) =>
@@ -71,6 +73,7 @@ export class ArmyInGameService {
     } else {
       armies = [
         ...battle.armies.map(army => ({
+          id: uuid(),
           name: army.name,
           currentUnits: army.units,
           currentLoadingTime: army.units,
@@ -82,7 +85,7 @@ export class ArmyInGameService {
     }
 
     const armiesInGame = this.armyInGameRepository.create(armies);
-    await this.saveArmiesInGame(armiesInGame);
+    this.saveArmiesInGame(armiesInGame);
     return armiesInGame;
   }
 

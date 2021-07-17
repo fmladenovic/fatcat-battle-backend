@@ -144,6 +144,6 @@ export class GameService {
     } as LogEntity;
     this.logService.createLog(log.id, message, battleInGameId, log.createdAt);
     this.wsService.createdLog(log);
-    Logger.log(new Date(), message);
+    Logger.log(log.createdAt, message);
   }
 }

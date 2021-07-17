@@ -8,10 +8,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ArmyInGameService } from '../../army/armyInGame/army-in-game.service';
-import { GameService } from '../../game/game.service';
 import { BattleEntity } from '../battle.entity';
 import { BattleInGameEntity } from './battle-in-game.entity';
 import { UpdateBattleInGameDTO } from './dto/update-battle-in-game.dto.';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class BattleInGameService {
@@ -36,9 +36,7 @@ export class BattleInGameService {
     }
   }
 
-  public async createInGameBattle(
-    battle: BattleEntity
-  ): Promise<BattleInGameEntity> {
+  public createInGameBattle(battle: BattleEntity): BattleInGameEntity {
     if (battle.armies.length < 3) {
       throw new BadRequestException(
         'Battle should contains at least three armies.'
@@ -46,13 +44,12 @@ export class BattleInGameService {
     }
 
     const battleInGame = this.battleInGameRepository.create({
+      id: uuid(),
       battle: { id: battle.id },
       // armiesInGame: armies,
       status: 'IN_PROGRESS'
     });
-
-    await this.saveBattleInGame(battleInGame);
-    const armiesInGame = await this.armyInGameService.createArmiesInGame(
+    const armiesInGame = this.armyInGameService.createArmiesInGame(
       battle,
       battleInGame
     );
@@ -61,13 +58,12 @@ export class BattleInGameService {
       ...battleInGame,
       armiesInGame
     });
-    await this.saveBattleInGame(battleInGameWitArmies);
+    this.saveBattleInGame(battleInGameWitArmies);
     return battleInGameWitArmies;
   }
 
   public async updateInGameBattle(battleInfo: UpdateBattleInGameDTO) {
     const battleInGame = this.battleInGameRepository.create(battleInfo);
-    console.log('OKEJ', battleInGame);
     await this.saveBattleInGame(battleInGame);
   }
 }
